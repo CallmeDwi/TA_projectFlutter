@@ -23,9 +23,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(primarySwatch: Colors.blue),
-        home: MultiBlocProvider(providers: [
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: MultiBlocProvider(
+        providers: [
           BlocProvider<AppCubits>(
             create: (context) => AppCubits(
               data: DataServices(),
@@ -34,6 +35,9 @@ class MyApp extends StatelessWidget {
           BlocProvider<StorePageInfoCubits>(
             create: (context) => StorePageInfoCubits(),
           ),
-        ], child: AppCubitLogics()));
+        ],
+        child: AppCubitLogics(),
+      ),
+    );
   }
 }
