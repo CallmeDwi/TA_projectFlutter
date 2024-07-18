@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "895303786091",
+    "project_id": "flutter-ekowisata-app",
+    "storage_bucket": "flutter-ekowisata-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:895303786091:android:ace7f7b59fe2f06e90db2e",
+        "android_client_info": {
+          "package_name": "com.example.perhutaniwisata_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCa99WTuVrq6Qs0_sv9PG39NE4RxyepwGY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
