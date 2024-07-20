@@ -7,30 +7,45 @@ import 'package:perhutaniwisata_app/components/square_tile.dart';
 import 'package:perhutaniwisata_app/cubit/app_cubit.dart';
 import 'package:perhutaniwisata_app/pages/home_page.dart';
 import 'package:logger/logger.dart';
-import 'package:perhutaniwisata_app/pages/profile_pages/register_page.dart';
+import 'package:perhutaniwisata_app/pages/profile_pages/login_page.dart';
 
 import '../../cubit/app_cubit_states.dart';
 
-class LoginPage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
   final Function()? onTap;
-  const LoginPage({Key? key, this.onTap}) : super(key: key);
+  const RegisterPage({Key? key, this.onTap}) : super(key: key);
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   final Logger _logger = Logger();
 
-  void signUserIn() async {
-    _logger.i('Attempting to sign in user with email: ${emailController.text}');
+  void signUserUp() async {
+    _logger.i('Attempting to sign up user with email: ${emailController.text}');
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      if (passwordController.text.length < 6) {
+        showErrorDialog('Password harus 6 karakter atau lebih!');
+        return;
+      }
+      if (passwordController.text != confirmPasswordController.text) {
+        showErrorDialog('Password tidak cocok!');
+        return;
+      }
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
-      _logger.i('User signed in successfully, navigating to HomePage.');
+      _logger.i('User signed up successfully, showing success snackbar.');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Pendaftaran berhasil! Silakan login.'),
+          backgroundColor: Colors.green,
+        ),
+      );
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -40,13 +55,13 @@ class _LoginPageState extends State<LoginPage> {
                 value: BlocProvider.of<AppCubits>(context),
               ),
             ],
-            child: HomePage(),
+            child: LoginPage(),
           ),
         ),
       );
     } catch (e) {
-      _logger.e('Error signing in: $e');
-      showErrorDialog(e.toString());
+      _logger.e('Error signing up: $e');
+      showErrorDialog('Email atau password yang dimasukkan salah!');
     }
   }
 
@@ -55,9 +70,9 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Center(child: Text('Login Error')),
+          title: Center(child: Text('Sign Up Error')),
           content: Text(
-            'Email atau password yang dimasukkan salah!',
+            errorMessage,
             style: TextStyle(color: Colors.red),
           ),
           actions: [
@@ -91,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(height: 30),
               Text(
-                'Welcome back',
+                'Buat akun baru!',
                 style: TextStyle(color: Colors.grey[700], fontSize: 16),
               ),
               const SizedBox(height: 30),
@@ -107,22 +122,15 @@ class _LoginPageState extends State<LoginPage> {
                 obscuredText: true,
               ),
               const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
+              MyTextField(
+                controller: confirmPasswordController,
+                hintText: 'Confirm Password',
+                obscuredText: true,
               ),
               const SizedBox(height: 25),
               MyButton(
-                text: 'Sign In',
-                onTap: signUserIn,
+                text: 'Sign Up',
+                onTap: signUserUp,
               ),
               const SizedBox(height: 50),
               Padding(
@@ -162,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Not a member?',
+                    'Already have an account?',
                     style: TextStyle(color: Colors.grey[700]),
                   ),
                   const SizedBox(width: 4),
@@ -171,12 +179,12 @@ class _LoginPageState extends State<LoginPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => RegisterPage(),
+                          builder: (context) => LoginPage(),
                         ),
                       );
                     },
                     child: Text(
-                      'Register now',
+                      'Login now',
                       style: TextStyle(
                         color: Colors.blue,
                         fontWeight: FontWeight.bold,
