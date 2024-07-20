@@ -18,7 +18,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  String? errorMessage;
   final Logger _logger = Logger();
 
   void signUserIn() async {
@@ -44,10 +43,31 @@ class _LoginPageState extends State<LoginPage> {
       );
     } catch (e) {
       _logger.e('Error signing in: $e');
-      setState(() {
-        errorMessage = e.toString();
-      });
+      showErrorDialog(e.toString());
     }
+  }
+
+  void showErrorDialog(String errorMessage) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Center(child: Text('Login Error')),
+          content: Text(
+            'Email atau password yang dimasukkan salah!',
+            style: TextStyle(color: Colors.red),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -70,15 +90,6 @@ class _LoginPageState extends State<LoginPage> {
               style: TextStyle(color: Colors.grey[700], fontSize: 16),
             ),
             const SizedBox(height: 30),
-            if (errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                child: Text(
-                  'Email atau password yang dimasukkan salah!',
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-            const SizedBox(height: 10),
             MyTextField(
               controller: emailController,
               hintText: 'Email',
@@ -126,10 +137,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   Expanded(
-                    child: Divider(
-                      thickness: 0.5,
-                      color: Colors.grey[400],
-                    ),
+                    child: Divider(thickness: 0.5, color: Colors.grey[400]),
                   ),
                 ],
               ),
