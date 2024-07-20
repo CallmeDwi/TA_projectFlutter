@@ -32,8 +32,12 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => BlocProvider.value(
-            value: BlocProvider.of<AppCubits>(context),
+          builder: (context) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(
+                value: BlocProvider.of<AppCubits>(context),
+              ),
+            ],
             child: HomePage(),
           ),
         ),
