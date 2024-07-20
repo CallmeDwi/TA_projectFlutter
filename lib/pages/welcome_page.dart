@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:perhutaniwisata_app/cubit/app_cubit.dart';
+import 'package:perhutaniwisata_app/pages/profile_pages/login_page.dart';
 import 'package:perhutaniwisata_app/widgets/app_large_text.dart';
 import 'package:perhutaniwisata_app/widgets/app_text.dart';
 import 'package:perhutaniwisata_app/widgets/responsive_button.dart';
@@ -19,6 +21,8 @@ class _WelcomePageState extends State<WelcomePage> {
     "welcome5.jpg",
     "welcome6.jpg",
   ];
+
+  String uid = '';
 
   PageController _pageController = PageController();
   Timer? _timer;
@@ -119,7 +123,13 @@ class _WelcomePageState extends State<WelcomePage> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    BlocProvider.of<AppCubits>(context).getData();
+                    GetStorage().read('uid') == null
+                        ? Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginPage()),
+                          )
+                        : BlocProvider.of<AppCubits>(context).getData();
                   },
                   child: Container(
                     width: 120,

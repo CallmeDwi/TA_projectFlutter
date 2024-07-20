@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:perhutaniwisata_app/components/my_textfield.dart';
 import 'package:perhutaniwisata_app/components/my_button.dart';
 import 'package:perhutaniwisata_app/components/square_tile.dart';
@@ -26,27 +27,26 @@ class _LoginPageState extends State<LoginPage> {
   void signUserIn() async {
     _logger.i('Attempting to sign in user with email: ${emailController.text}');
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
-      _logger.i('User signed in successfully, navigating to HomePage.');
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MultiBlocProvider(
-            providers: [
-              BlocProvider.value(
-                value: BlocProvider.of<AppCubits>(context),
-              ),
-            ],
-            child: HomePage(),
-          ),
-        ),
-      );
+      _logger.i('User signed in successfully: ${userCredential.user?.uid}');
+
+      // Check if the user is not null
+      if (userCredential.user != null) {
+        _logger.i('Navigating to HomePage.');
+        BlocProvider.of<AppCubits>(context).getData();
+
+        // GetStorage().write('uid', userCredential.user!.uid);
+      } else {
+        _logger.e('User is null after sign in.');
+        showErrorDialog('Terjadi kesalahan saat masuk. Silakan coba lagi.');
+      }
     } catch (e) {
       _logger.e('Error signing in: $e');
-      showErrorDialog(e.toString());
+      showErrorDialog('Email atau password yang dimasukkan salah!');
     }
   }
 

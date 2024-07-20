@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:perhutaniwisata_app/pages/drawer_pages/my_list_tile.dart';
 
 import '../profile_pages/login_page.dart';
@@ -30,14 +31,6 @@ class MyDrawer extends StatelessWidget {
                 onTap: () => Navigator.pop(context),
               ),
               MyListTile(
-                icon: Icons.login,
-                text: 'L O G I N',
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => LoginPage()));
-                },
-              ),
-              MyListTile(
                 icon: Icons.person,
                 text: 'P R O F I L E',
                 onTap: onProfileTap,
@@ -49,7 +42,14 @@ class MyDrawer extends StatelessWidget {
             child: MyListTile(
               icon: Icons.logout,
               text: 'L O G O U T',
-              onTap: onSignOut,
+              onTap: () {
+                GetStorage().erase();
+                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+                  builder: (context) {
+                    return LoginPage();
+                  },
+                ), ModalRoute.withName("/Login"));
+              },
             ),
           ),
         ],

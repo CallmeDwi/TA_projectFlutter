@@ -20,6 +20,7 @@ dependencies:
   http: 
   firebase_storage: ^11.6.0
   logger: ^2.4.0
+  get_storage: ^2.1.1
 
 dev_dependencies:
   flutter_test:

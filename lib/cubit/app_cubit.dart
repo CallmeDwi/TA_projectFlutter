@@ -12,14 +12,16 @@ class AppCubits extends Cubit<CubitStates> {
   late final List<DataModel> places;
 
   void getData() async {
-    try {
-      emit(LoadingState());
-      places = await data.getInfo();
-      emit(LoadedState(places));
-    } catch (e) {
-      // Handle error
-    }
+  try {
+    emit(LoadingState());
+    places = await data.getInfo();
+    emit(LoadedState(places));
+  } catch (e) {
+    // Emit a state that represents an error
+    emit(ErrorState(e.toString()));
   }
+}
+
 
   void detailPage(DataModel data) {
     emit(DetailState(data));
