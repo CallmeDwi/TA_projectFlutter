@@ -15,6 +15,7 @@ import '../../cubit/app_cubit_states.dart';
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
   const LoginPage({Key? key, this.onTap}) : super(key: key);
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -39,6 +40,9 @@ class _LoginPageState extends State<LoginPage> {
         _logger.i('Navigating to HomePage.');
         BlocProvider.of<AppCubits>(context).getData();
 
+        // Show success dialog
+        showSuccessDialog('Berhasil Login!');
+
         // GetStorage().write('uid', userCredential.user!.uid);
       } else {
         _logger.e('User is null after sign in.');
@@ -50,6 +54,29 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  void showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Center(child: Text('Login Success')),
+          content: Text(
+            message,
+            style: TextStyle(color: Colors.green),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void showErrorDialog(String errorMessage) {
     showDialog(
       context: context,
@@ -57,7 +84,7 @@ class _LoginPageState extends State<LoginPage> {
         return AlertDialog(
           title: Center(child: Text('Login Error')),
           content: Text(
-            'Email atau password yang dimasukkan salah!',
+            errorMessage,
             style: TextStyle(color: Colors.red),
           ),
           actions: [

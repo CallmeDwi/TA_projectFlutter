@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,6 +15,7 @@ import '../../cubit/app_cubit_states.dart';
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
   const RegisterPage({Key? key, this.onTap}) : super(key: key);
+
   @override
   _RegisterPageState createState() => _RegisterPageState();
 }
@@ -24,28 +26,41 @@ class _RegisterPageState extends State<RegisterPage> {
   final confirmPasswordController = TextEditingController();
   final Logger _logger = Logger();
 
-  void signUserUp() async {
-    _logger.i('Attempting to sign up user with email: ${emailController.text}');
+  void daftarPengguna() async {
+    _logger
+        .i('Mencoba mendaftar pengguna dengan email: ${emailController.text}');
     try {
       if (passwordController.text.length < 6) {
-        showErrorDialog('Password harus 6 karakter atau lebih!');
+        tampilkanDialogKesalahan('Password harus 6 karakter atau lebih!');
         return;
       }
       if (passwordController.text != confirmPasswordController.text) {
-        showErrorDialog('Password tidak cocok!');
+        tampilkanDialogKesalahan('Password tidak cocok!');
         return;
       }
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
-      _logger.i('User signed up successfully, showing success snackbar.');
+
+      await FirebaseFirestore.instance
+          .collection("Users")
+          .doc(userCredential.user!.uid)
+          .set({
+        'username': emailController.text.split('@')[0],
+        'bio': 'Bio kosong..',
+      });
+
+      _logger.i('Pengguna berhasil mendaftar, menampilkan snackbar sukses.');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Pendaftaran berhasil! Silakan login.'),
           backgroundColor: Colors.green,
         ),
       );
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -60,19 +75,19 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       );
     } catch (e) {
-      _logger.e('Error signing up: $e');
-      showErrorDialog('Email atau password yang dimasukkan salah!');
+      _logger.e('Kesalahan saat mendaftar: $e');
+      tampilkanDialogKesalahan('Email atau password yang dimasukkan salah!');
     }
   }
 
-  void showErrorDialog(String errorMessage) {
+  void tampilkanDialogKesalahan(String pesanKesalahan) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Center(child: Text('Sign Up Error')),
+          title: Center(child: Text('Kesalahan Pendaftaran')),
           content: Text(
-            errorMessage,
+            pesanKesalahan,
             style: TextStyle(color: Colors.red),
           ),
           actions: [
@@ -124,13 +139,13 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 10),
               MyTextField(
                 controller: confirmPasswordController,
-                hintText: 'Confirm Password',
+                hintText: 'Konfirmasi Password',
                 obscuredText: true,
               ),
               const SizedBox(height: 25),
               MyButton(
-                text: 'Sign Up',
-                onTap: signUserUp,
+                text: 'Daftar',
+                onTap: daftarPengguna,
               ),
               const SizedBox(height: 50),
               Padding(
@@ -146,7 +161,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: Text(
-                        'Or continue with',
+                        'Atau lanjutkan dengan',
                         style: TextStyle(color: Colors.grey[700]),
                       ),
                     ),
@@ -170,7 +185,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Already have an account?',
+                    'Sudah punya akun?',
                     style: TextStyle(color: Colors.grey[700]),
                   ),
                   const SizedBox(width: 4),
@@ -184,7 +199,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       );
                     },
                     child: Text(
-                      'Login now',
+                      'Login sekarang',
                       style: TextStyle(
                         color: Colors.blue,
                         fontWeight: FontWeight.bold,
